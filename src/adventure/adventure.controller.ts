@@ -61,8 +61,8 @@ export class AdventureController {
     status: 200,
     type: AdventureCountCreationResponseDto,
   })
-  @Get("/count")
-  async getAdventureCount(@Query('uuid') uuid: string): Promise<AdventureCountCreationResponseDto> {
+  @Get("/count/:uuid")
+  async getAdventureCount(@Param('uuid') uuid: string): Promise<AdventureCountCreationResponseDto> {
     return await this.adventureService.getAdventureCount(uuid);
   }
 }
