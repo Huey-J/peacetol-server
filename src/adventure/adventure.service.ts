@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Adventure, PrismaClient } from '@prisma/client';
+import { Adventure } from '@prisma/client';
 import { AdventureRepository } from './repository/adventure.repository';
 import { ReviewRepository } from './repository/review.repository';
 import { UserRepository } from '../user/user.repository';
@@ -19,7 +19,6 @@ import { MissionDto } from './dto/create.mission';
 
 @Injectable()
 export class AdventureService {
-  private prisma = new PrismaClient();
   constructor(
     private readonly adventureRepository: AdventureRepository,
     private readonly userRepository: UserRepository,
@@ -108,12 +107,7 @@ export class AdventureService {
 
     const isTransportation = missionOne.isTransportation;
     for (let step = 2; step < 5; step++) {
-      const templates = await this.prisma.missionTemplate.findMany({
-        where: {
-          step: step,
-          OR: [{ isTransportation: isTransportation }, { isTransportation: null }],
-        },
-      });
+      const templates = await this.missionTemplateRepository.findListWithOR(step, isTransportation);
       const selectedTemplate = templates[Math.floor(Math.random() * templates.length)];
       const mission = await this.missionRepository.createMissionFromTemplate(selectedTemplate, createdAdventure.id);
     }

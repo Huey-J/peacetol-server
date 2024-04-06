@@ -24,4 +24,15 @@ export class MissionTemplateRepository {
 
     return await templates;
   }
+
+  async findListWithOR(step: number, isTransportation: boolean): Promise<MissionTemplate[]> {
+    const templates = prisma.missionTemplate.findMany({
+      where: {
+        step: step,
+        OR: [{ isTransportation: isTransportation }, { isTransportation: null }],
+      },
+    });
+
+    return await templates;
+  }
 }
