@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAdventureDto } from './dto/create.adventure.request';
 import { AdventureRepository } from './adventure.repository';
+import { ReviewRepository } from './review.repository';
 import { UserRepository } from '../user/user.repository';
 import { PrismaClient } from '@prisma/client';
 import { AdventureResponseDto, Mission } from './dto/adventure.response';
 // import { AddNextStepForAdventureDto } from './dto/add.next.step.for.adventure.request';
 import { MissionRepository } from './mission.repository';
 import { AdventureCreationResponseDto } from './dto/create.adventure.response';
+import { CreateReviewDto, ReviewCreationResponseDto } from './dto/create.review';
 
 @Injectable()
 export class AdventureService {
@@ -15,6 +17,7 @@ export class AdventureService {
     private readonly adventureRepository: AdventureRepository,
     private readonly userRepository: UserRepository,
     private readonly missionRepository: MissionRepository,
+    private readonly reviewRepository: ReviewRepository,
   ) {}
 
   async getById(adventureId: string): Promise<AdventureResponseDto> {
@@ -29,6 +32,19 @@ export class AdventureService {
     responseDto.difficulty = adventure.difficulty;
     responseDto.missions = missions;
     return responseDto;
+  }
+
+  async createReview(id: string, createReviewDto: CreateReviewDto): Promise<ReviewCreationResponseDto> {
+    const { star } = createReviewDto;
+    const adventureId = parseInt(id);
+    const createdReview = await this.reviewRepository.createReview(star, adventureId);
+
+    const adventure = await this.adventureRepository.updateEndedAt(adventureId);
+
+    const response = new ReviewCreationResponseDto();
+    response.review_id = createdReview.id;
+    response.adventure_id = adventure.id;
+    return response;
   }
 
   async createAdventure(createAdventureDto: CreateAdventureDto): Promise<AdventureCreationResponseDto> {

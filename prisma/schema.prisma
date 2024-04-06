@@ -51,3 +51,8 @@ enum AnswerType {
   Theater
   Karaoke
 }
+model Review {
+  id            Int     @id @default(autoincrement())
+  star          Int?
+  adventureId   Int
+}
