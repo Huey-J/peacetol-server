@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { AdventureRepository } from './adventure.repository';
 import { ReviewRepository } from './review.repository';
 import { UserRepository } from '../user/user.repository';
-import { Adventure, AnswerType, Mission, PrismaClient } from '@prisma/client';
+import { Adventure, PrismaClient } from '@prisma/client';
 import { MissionRepository } from './mission.repository';
 
-import { CreateAdventureDto, CreateCountDto } from './dto/create.adventure.request';
+import { CreateAdventureDto } from './dto/create.adventure.request';
 import { AdventureResponseDto, MissionDto } from './dto/adventure.response';
 import { AddNextStepForAdventureDto } from './dto/add.next.step.for.adventure.request';
 import { AdventureCreationResponseDto, AdventureCountCreationResponseDto } from './dto/create.adventure.response';

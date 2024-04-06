@@ -1,8 +1,9 @@
 import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AdventureService } from './adventure.service';
+
 import { AdventureResponseDto } from './dto/adventure.response';
-import { CreateAdventureDto, CreateCountDto } from './dto/create.adventure.request';
+import { CreateAdventureDto } from './dto/create.adventure.request';
 import { AdventureCreationResponseDto, AdventureCountCreationResponseDto } from './dto/create.adventure.response';
 import { CreateReviewDto, ReviewCreationResponseDto } from './dto/create.review';
 import { AddNextStepForAdventureDto } from './dto/add.next.step.for.adventure.request';

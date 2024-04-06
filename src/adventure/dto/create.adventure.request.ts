@@ -6,8 +6,3 @@ export class CreateAdventureDto {
   @ApiProperty()
   userUuid: string;
 }
-
-export class CreateCountDto {
-  @ApiProperty()
-  userUuid: string;
-}
