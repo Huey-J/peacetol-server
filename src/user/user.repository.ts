@@ -17,9 +17,9 @@ export class UserRepository {
   async findUser(userUuid: string): Promise<number> {
     const user = prisma.user.findUnique({
       where: { uuid: userUuid },
-    })
+    });
 
     if (!user) throw new Error('User not found');
-    return (await (user)).id;
+    return (await user).id;
   }
 }

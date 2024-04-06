@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Param, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AdventureService } from './adventure.service';
 import { AdventureResponseDto } from './dto/adventure.response';
-import { CreateAdventureDto } from './dto/create.adventure.request';
-import { AdventureCreationResponseDto } from './dto/create.adventure.response';
+import { CreateAdventureDto, CreateCountDto } from './dto/create.adventure.request';
+import { AdventureCreationResponseDto, AdventureCountCreationResponseDto } from './dto/create.adventure.response';
 import { CreateReviewDto, ReviewCreationResponseDto } from './dto/create.review';
 import { AddNextStepForAdventureDto } from './dto/add.next.step.for.adventure.request';
 
@@ -26,7 +26,7 @@ export class AdventureController {
     status: 201,
     type: AdventureCreationResponseDto,
   })
-  @Post() 
+  @Post()
   async create(@Body() createAdventureDto: CreateAdventureDto): Promise<AdventureCreationResponseDto> {
     return await this.adventureService.createAdventure(createAdventureDto);
   }
@@ -53,5 +53,15 @@ export class AdventureController {
   @Put('/:id/finish')
   async finishAdventure(@Param('id') id: string, @Body() createReviewDto: CreateReviewDto): Promise<ReviewCreationResponseDto> {
     return await this.adventureService.createReview(id, createReviewDto);
+  }
+
+  @ApiOperation({ summary: 'adventure 개수 세기' })
+  @ApiResponse({
+    status: 200,
+    type: AdventureCountCreationResponseDto,
+  })
+  @Get()
+  async getAdventureCount(@Query('uuid') uuid: string): Promise<AdventureCountCreationResponseDto> {
+    return await this.adventureService.getAdventureCount(uuid);
   }
 }

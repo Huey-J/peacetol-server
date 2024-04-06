@@ -8,7 +8,11 @@ export class AdventureRepository {
     const adventure = prisma.adventure.create({
       data: {
         difficulty: difficulty,
-        userId: userId,
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
       },
     });
 
@@ -23,6 +27,16 @@ export class AdventureRepository {
     });
 
     return await adventure;
+  }
+
+  async getByUserId(userId: number): Promise<Adventure[]> {
+    const adventures = prisma.adventure.findMany({
+      where: {
+        userId: userId,
+      },
+    });
+
+    return await adventures;
   }
 
   async updateEndedAt(adventureId: number): Promise<Adventure> {
