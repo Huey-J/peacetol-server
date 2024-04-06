@@ -8,8 +8,9 @@ datasource db {
 }
 
 model User {
-  id          Int       @id @default(autoincrement())
-  uuid        String    @unique
+  id            Int           @id @default(autoincrement())
+  uuid          String        @unique
+  adventures    Adventure[]
 }
 
 model Adventure {
@@ -21,12 +22,13 @@ model Adventure {
   finalSelectedAnswerType   AnswerType?
   isFirstTransportation     Boolean?
   isFinalTransportation     Boolean?
+  user                      User        @relation(fields: [userId], references: [id])
   userId                    Int
 }
 
 model Mission {
   id            Int         @id @default(autoincrement())
-  step          Int
+  step          Int?
   body          String
   quote         String
   imagePath     String?

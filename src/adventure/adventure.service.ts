@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAdventureDto } from './dto/create.adventure.request';
 import { AdventureRepository } from './adventure.repository';
 import { ReviewRepository } from './review.repository';
 import { UserRepository } from '../user/user.repository';
 import { Adventure, AnswerType, Mission, PrismaClient } from '@prisma/client';
+import { MissionRepository } from './mission.repository';
+
+import { CreateAdventureDto, CreateCountDto } from './dto/create.adventure.request';
 import { AdventureResponseDto, MissionDto } from './dto/adventure.response';
 import { AddNextStepForAdventureDto } from './dto/add.next.step.for.adventure.request';
-import { MissionRepository } from './mission.repository';
-import { AdventureCreationResponseDto } from './dto/create.adventure.response';
+import { AdventureCreationResponseDto, AdventureCountCreationResponseDto } from './dto/create.adventure.response';
 import { CreateReviewDto, ReviewCreationResponseDto } from './dto/create.review';
 
 @Injectable()
@@ -55,6 +56,17 @@ export class AdventureService {
     return response;
   }
 
+  async getAdventureCount(uuid: string): Promise<AdventureCountCreationResponseDto> {
+    const userId = await this.userRepository.findUser(uuid);
+
+    const adventures = await this.adventureRepository.getByUserId(userId);
+    const count = adventures.filter((adventure) => adventure.endedAt !== null).length;
+
+    const response = new AdventureCountCreationResponseDto();
+    response.count = count;
+    return response;
+  }
+
   async createAdventure(createAdventureDto: CreateAdventureDto): Promise<AdventureCreationResponseDto> {
     const { difficulty, userUuid } = createAdventureDto;
     const userId = await this.userRepository.findUser(userUuid);
@@ -86,7 +98,7 @@ export class AdventureService {
   }
 
   async addNextStep(adventureId: string, addNextStepForAdventureDto: AddNextStepForAdventureDto): Promise<AdventureCreationResponseDto> {
-    const {userUuid, answerType} = addNextStepForAdventureDto;
+    const { userUuid, answerType } = addNextStepForAdventureDto;
 
     const adventure: Adventure = await this.adventureRepository.getById(parseInt(adventureId));
     const userId: number = await this.userRepository.findUser(userUuid);
