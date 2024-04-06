@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { VersioningType } from '@nestjs/common';
+// import { VersioningType } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,16 +12,18 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/swagger/docs', app, document);
 
+  // app.enableVersioning({
+  //   type: VersioningType.URI,
+  // });
+
   // CORS 설정
   // 특정 origin만 요청 허용
   app.enableCors({
-    // origin: appConfig.get("app.env") === "production" ? appConfig.get("app.domain") : "*",
-    origin: "*",
+    // origin: ['*', 'http://localhost:5173', 'localhost:5173'],
+    // methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
+    origin: true,
     credentials: true,
-    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
-  });
-  app.enableVersioning({
-    type: VersioningType.URI,
+    // exposedHeaders: ['Authorization'], // * 사용할 헤더 추가.
   });
 
   await app.listen(port);
