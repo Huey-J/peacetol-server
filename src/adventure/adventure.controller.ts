@@ -23,9 +23,9 @@ export class AdventureController {
   @ApiOperation({ summary: '모험 생성' })
   @ApiResponse({
     status: 201,
-    type: AdventureResponseDto,
+    type: AdventureCreationResponseDto,
   })
-  @Post()
+  @Post() 
   async create(@Body() createAdventureDto: CreateAdventureDto): Promise<AdventureCreationResponseDto> {
     return await this.adventureService.createAdventure(createAdventureDto);
   }
