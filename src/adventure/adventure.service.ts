@@ -74,7 +74,7 @@ export class AdventureService {
     const createdAdventure = await this.adventureRepository.createAdventure(difficulty, userId);
 
     // 1번 미션의 isTransportation 따라 2번 3번 미션 달라져야 함
-    for (let step = 1; step < 4; step++) {
+    for (let step = 1; step < 5; step++) {
       const templates = await this.prisma.missionTemplate.findMany({
         where: { step },
       });
@@ -108,22 +108,7 @@ export class AdventureService {
       throw new Error('Not your adventure.');
     }
 
-    const firstMission = await this.missionRepository.findByAdventureIdAndStep(parseInt(adventureId), 1);
-
-    const templateFourList = await this.prisma.missionTemplate.findMany({
-      where: { step: 4, isTransportation: firstMission.isTransportation },
-    });
-    const selectedFourTemplate = templateFourList[Math.floor(Math.random() * templateFourList.length)];
-    const missionFour = await this.prisma.mission.create({
-      data: {
-        step: selectedFourTemplate.step,
-        body: selectedFourTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * selectedFourTemplate.endNumber) + 1)),
-        quote: selectedFourTemplate.quote,
-        imagePath: selectedFourTemplate.imagePath,
-        isTransportation: selectedFourTemplate.isTransportation,
-        adventureId: adventure.id,
-      },
-    });
+    // const firstMission = await this.missionRepository.findByAdventureIdAndStep(parseInt(adventureId), 1);
 
     const templateFiveList = await this.prisma.missionTemplate.findMany({
       where: { step: 5, answerType: answerType },
