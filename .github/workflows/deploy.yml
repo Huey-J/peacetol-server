@@ -24,6 +24,7 @@ jobs:
           key: ${{ secrets.KEY }} # ec2 instance pem key
           port: ${{ secrets.PORT }} # 접속포트
           script: | # 실행할 스크립트
+            sudo kill -9 $(sudo lsof -t -i:8000)
             cd /home/ubuntu/peacetol-server
             git pull origin main
             # pm2 kill
