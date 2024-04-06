@@ -69,10 +69,10 @@ INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endN
 INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endNumber, isTransportation) VALUES (72, 8, '코인노래방에 가서 <span>‘장윤정’</span>의 노래를 불러보세요!', '스트레스 확 풀고 오세요', '/mike.png', null, null, null);
 INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endNumber, isTransportation) VALUES (73, 8, '코인노래방에 가서 <span>‘허각’</span>의 노래를 불러보세요!', '스트레스 확 풀고 오세요', '/mike.png', null, null, null);
 INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endNumber, isTransportation) VALUES (74, 8, '코인노래방에 가서 <span>최애곡</span>을 부르세요!', '스트레스 확 풀고 오세요', '/mike.png', null, null, null);
-INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endNumber, isTransportation) VALUES (75, 9, '장소에서 나와 주변을 둘러 보세요.', '또 안 보이던 게 보일 거예요', '/nature.png', null, null, null);
-INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endNumber, isTransportation) VALUES (76, 9, '쉴 곳을 찾아 눈을 감고 명상을 해 보세요.', '한 번씩 생각을 비워보는 것도 좋아요', '/meditation.png', null, null, null);
-INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endNumber, isTransportation) VALUES (77, 9, '쉴 곳을 찾아 크게 숨을 쉬어 보세요.', '크게 숨을 쉬어본 게 언제가 마지막인가요?', '/breath.png', null, null, null);
-INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endNumber, isTransportation) VALUES (78, 9, '장소에서 나와 미소를 지어 보세요.', '미소를 짓는 것만으로 기분이 좋아진대요', '/cloud.png', null, null, null);
+INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endNumber, isTransportation) VALUES (75, 9, '버려진 음료캔을 찾아서 버리고 똑같은 것을 사 먹으세요.', '좋아하는 음료인가요?', '/can.png', null, null, null);
+INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endNumber, isTransportation) VALUES (76, 9, '밖으로 나와 가까운 편의점이 보일 때까지 전력질주해 볼까요?', '출발~', '/run.png', null, null, null);
+INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endNumber, isTransportation) VALUES (77, 9, '근처에 있는 문구점에 가서 동심으로 돌아가 볼까요?', '고무찰흙으로 김밥 만드는 거 아세요?', '/stuff.png', null, null, null);
+INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endNumber, isTransportation) VALUES (78, 9, '가까운 마트에 가서 마음에 드는 양말을 하나 사 보세요!', '새로운 걸 사면 기분이 조크든요', '/socks.png', null, null, null);
 INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endNumber, isTransportation) VALUES (79, 10, '지금 한 사람을 떠올려 보세요!', '?', null, null, null, null);
 INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endNumber, isTransportation) VALUES (80, 10, '그 사람에게 <span>전화</span>해 보세요.', '두근두근', '/call.png', null, null, null);
 INSERT INTO MissionTemplate (id, step, body, quote, imagePath, startNumber, endNumber, isTransportation) VALUES (81, 10, '그 사람에게 <span>사랑한다고</span>말해 보세요.', '두근두근', '/love.png', null, null, null);

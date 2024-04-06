@@ -4,8 +4,8 @@ import { AdventureService } from './adventure.service';
 import { AdventureResponseDto } from './dto/adventure.response';
 import { CreateAdventureDto } from './dto/create.adventure.request';
 import { AdventureCreationResponseDto } from './dto/create.adventure.response';
+import { CreateReviewDto, ReviewCreationResponseDto } from './dto/create.review';
 import { AddNextStepForAdventureDto } from './dto/add.next.step.for.adventure.request';
-// import { AddNextStepForAdventureDto } from './dto/add.next.step.for.adventure.request';
 
 @ApiTags('AdventureController')
 @Controller('/api/v1/adventures')
@@ -47,5 +47,7 @@ export class AdventureController {
 
   @ApiOperation({ summary: '모험 마무리' })
   @Post('/:id/finish')
-  async finishAdventure(@Param('id') id: number): Promise<void> {}
+  async finishAdventure(@Param('id') id: string, @Body() createReviewDto: CreateReviewDto): Promise<ReviewCreationResponseDto> {
+    return await this.adventureService.createReview(id, createReviewDto);
+  }
 }
