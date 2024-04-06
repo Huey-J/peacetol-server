@@ -10,6 +10,8 @@ import { AdventureResponseDto, MissionDto } from './dto/adventure.response';
 import { AddNextStepForAdventureDto } from './dto/add.next.step.for.adventure.request';
 import { AdventureCreationResponseDto, AdventureCountCreationResponseDto, RecentAdventureResponseDto } from './dto/create.adventure.response';
 import { CreateReviewDto, ReviewCreationResponseDto } from './dto/create.review';
+import { defineDmmfProperty } from '@prisma/client/runtime/library';
+import { error } from 'console';
 
 @Injectable()
 export class AdventureService {
@@ -158,7 +160,7 @@ export class AdventureService {
           adventureId: adventure.id,
         },
       });
-  
+
       const templateSevenList = await this.prisma.missionTemplate.findMany({
         where: { step: 10 },
       });
@@ -191,8 +193,11 @@ export class AdventureService {
       throw new Error('Not your adventure.');
     }
 
-    // const firstMission = await this.missionRepository.findByAdventureIdAndStep(parseInt(adventureId), 1);
+    const length = await this.missionRepository.findLength(adventure.id);
 
+    if (length > 4) {
+      throw new Error('Already exist');
+    }
     const templateFiveList = await this.prisma.missionTemplate.findMany({
       where: { step: 5, answerType: answerType },
     });
@@ -223,7 +228,7 @@ export class AdventureService {
           adventureId: adventure.id,
         },
       });
-  
+
       const templateSevenList = await this.prisma.missionTemplate.findMany({
         where: { step: 7 },
       });
