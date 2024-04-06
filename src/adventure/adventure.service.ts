@@ -96,7 +96,22 @@ export class AdventureService {
       throw new Error('Not your adventure.');
     }
 
-    // const firstMission = await this.missionRepository.findByAdventureIdAndStep(parseInt(adventureId), 1);
+    const firstMission = await this.missionRepository.findByAdventureIdAndStep(parseInt(adventureId), 1);
+
+    const templateFourList = await this.prisma.missionTemplate.findMany({
+      where: { step: 4, isTransportation: firstMission.isTransportation },
+    });
+    const selectedFourTemplate = templateFourList[Math.floor(Math.random() * templateFourList.length)];
+    const missionFour = await this.prisma.mission.create({
+      data: {
+        step: selectedFourTemplate.step,
+        body: selectedFourTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * selectedFourTemplate.endNumber) + 1)),
+        quote: selectedFourTemplate.quote,
+        imagePath: selectedFourTemplate.imagePath,
+        isTransportation: selectedFourTemplate.isTransportation,
+        adventureId: adventure.id,
+      },
+    });
 
     const templateFiveList = await this.prisma.missionTemplate.findMany({
       where: { step: 5, answerType: answerType },

@@ -13,4 +13,15 @@ export class MissionRepository {
 
     return await missions;
   }
+
+  async findByAdventureIdAndStep(adventureId: number, step: number): Promise<Mission> {
+    const mission = prisma.mission.findFirst({
+      where: {
+        adventureId: adventureId,
+        step: step
+      }
+    });
+
+    return await mission;
+  }
 }
