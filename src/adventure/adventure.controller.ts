@@ -66,7 +66,7 @@ export class AdventureController {
     return await this.adventureService.getAdventureCount(uuid);
   }
 
-  @ApiOperation({ summary: '최근 3개 adventure' })
+  @ApiOperation({ summary: '최근 adventure 순서' })
   @ApiResponse({
     status: 200,
     type: RecentAdventureResponseDto,

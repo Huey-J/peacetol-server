@@ -71,10 +71,7 @@ export class AdventureService {
     const userId = await this.userRepository.findUser(uuid);
 
     const adventures = await this.adventureRepository.getByUserId(userId);
-    const recentAdventures = adventures
-      .filter((adventure) => adventure.endedAt !== null)
-      .sort((a, b) => b.endedAt.getTime() - a.endedAt.getTime())
-      .slice(0, 3);
+    const recentAdventures = adventures.filter((adventure) => adventure.endedAt !== null).sort((a, b) => b.endedAt.getTime() - a.endedAt.getTime());
 
     const response = await Promise.all(
       recentAdventures.map(async (adventure) => {
