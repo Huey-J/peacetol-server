@@ -43,6 +43,7 @@ model MissionTemplate {
   startNumber       Int?
   endNumber         Int?
   isTransportation  Boolean?
+  answerType        AnswerType?
 }
 
 // enum
