@@ -20,7 +20,8 @@ model Adventure {
   difficulty                Int   // 1~3
   firstSelectedAnswerType   AnswerType?
   finalSelectedAnswerType   AnswerType?
-  imagePath                 String?
+  isFirstTransportation     Boolean?
+  isFinalTransportation     Boolean?
   user                      User        @relation(fields: [userId], references: [id])
   userId                    Int
   mission                   Mission[]
@@ -29,16 +30,21 @@ model Adventure {
 model Mission {
   id            Int         @id @default(autoincrement())
   body          String
+  quote         String
+  imagePath     String?
   adventure     Adventure   @relation(fields: [adventureId], references: [id])
   adventureId   Int
 }
 
 model MissionTemplate {
-  id            Int         @id @default(autoincrement())
-  step          Int
-  body          String
-  startNumber   Int
-  endNumber     Int
+  id                Int         @id @default(autoincrement())
+  step              Int
+  body              String
+  quote             String
+  imagePath         String?
+  startNumber       Int?
+  endNumber         Int?
+  isTransportation  Boolean?
 }
 
 // enum
