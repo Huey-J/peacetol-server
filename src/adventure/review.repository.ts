@@ -14,4 +14,14 @@ export class ReviewRepository {
 
     return await review;
   }
+
+  async findStarByAdventureId(adventureId: number): Promise<number> {
+    const review = prisma.review.findFirst({
+      where: {
+        adventureId: adventureId,
+      },
+    });
+
+    return (await review).star;
+  }
 }

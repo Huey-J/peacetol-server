@@ -4,7 +4,7 @@ import { AdventureService } from './adventure.service';
 
 import { AdventureResponseDto } from './dto/adventure.response';
 import { CreateAdventureDto } from './dto/create.adventure.request';
-import { AdventureCreationResponseDto, AdventureCountCreationResponseDto } from './dto/create.adventure.response';
+import { AdventureCreationResponseDto, AdventureCountCreationResponseDto, RecentAdventureResponseDto } from './dto/create.adventure.response';
 import { CreateReviewDto, ReviewCreationResponseDto } from './dto/create.review';
 import { AddNextStepForAdventureDto } from './dto/add.next.step.for.adventure.request';
 
@@ -66,5 +66,15 @@ export class AdventureController {
   @Get('/count/:uuid')
   async getAdventureCount(@Param('uuid') uuid: string): Promise<AdventureCountCreationResponseDto> {
     return await this.adventureService.getAdventureCount(uuid);
+  }
+
+  @ApiOperation({ summary: '최근 adventure 순서' })
+  @ApiResponse({
+    status: 200,
+    type: RecentAdventureResponseDto,
+  })
+  @Get('/recent/:uuid')
+  async getRecentAdventure(@Param('uuid') uuid: string): Promise<RecentAdventureResponseDto[]> {
+    return await this.adventureService.getRecentAdventure(uuid);
   }
 }

@@ -8,7 +8,7 @@ import { MissionRepository } from './mission.repository';
 import { CreateAdventureDto } from './dto/create.adventure.request';
 import { AdventureResponseDto, MissionDto } from './dto/adventure.response';
 import { AddNextStepForAdventureDto } from './dto/add.next.step.for.adventure.request';
-import { AdventureCreationResponseDto, AdventureCountCreationResponseDto } from './dto/create.adventure.response';
+import { AdventureCreationResponseDto, AdventureCountCreationResponseDto, RecentAdventureResponseDto } from './dto/create.adventure.response';
 import { CreateReviewDto, ReviewCreationResponseDto } from './dto/create.review';
 
 @Injectable()
@@ -64,6 +64,26 @@ export class AdventureService {
 
     const response = new AdventureCountCreationResponseDto();
     response.count = count;
+    return response;
+  }
+
+  async getRecentAdventure(uuid: string): Promise<RecentAdventureResponseDto[]> {
+    const userId = await this.userRepository.findUser(uuid);
+
+    const adventures = await this.adventureRepository.getByUserId(userId);
+    const recentAdventures = adventures.filter((adventure) => adventure.endedAt !== null).sort((a, b) => b.endedAt.getTime() - a.endedAt.getTime());
+
+    const response = await Promise.all(
+      recentAdventures.map(async (adventure) => {
+        const dto = new RecentAdventureResponseDto();
+        dto.createdAt = adventure.createdAt;
+        dto.endedAt = adventure.endedAt;
+        dto.difficulty = adventure.difficulty;
+        dto.review_star = await this.reviewRepository.findStarByAdventureId(adventure.id);
+        return dto;
+      }),
+    );
+
     return response;
   }
 
