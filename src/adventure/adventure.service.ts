@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AdventureRepository } from './adventure.repository';
 import { ReviewRepository } from './review.repository';
 import { UserRepository } from '../user/user.repository';
-import { Adventure, PrismaClient } from '@prisma/client';
+import { Adventure, MissionTemplate, PrismaClient } from '@prisma/client';
 import { MissionRepository } from './mission.repository';
 
 import { CreateAdventureDto } from './dto/create.adventure.request';
@@ -95,23 +95,22 @@ export class AdventureService {
 
     const createdAdventure = await this.adventureRepository.createAdventure(difficulty, userId);
 
-    // 1번 미션의 isTransportation 따라 2번 3번 미션 달라져야 함
-    for (let step = 1; step < 5; step++) {
+    const templateFirstList = await this.prisma.missionTemplate.findMany({
+      where: { step: 1 },
+    });
+    const selectedFirstTemplate = templateFirstList[Math.floor(Math.random() * templateFirstList.length)];
+    const missionOne = await this.createMissionFromTemplate(selectedFirstTemplate, createdAdventure.id);
+    
+    const isTransportation = missionOne.isTransportation;
+    for (let step = 2; step < 5; step++) {
       const templates = await this.prisma.missionTemplate.findMany({
-        where: { step },
-      });
-      const selectedTemplate = templates[Math.floor(Math.random() * templates.length)];
-
-      const mission = await this.prisma.mission.create({
-        data: {
-          step: selectedTemplate.step,
-          body: selectedTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * selectedTemplate.endNumber) + 1)),
-          quote: selectedTemplate.quote,
-          imagePath: selectedTemplate.imagePath,
-          isTransportation: selectedTemplate.isTransportation,
-          adventureId: createdAdventure.id,
+        where: {
+          step: step,
+          OR: [{ isTransportation: isTransportation }, { isTransportation: null }],
         },
       });
+      const selectedTemplate = templates[Math.floor(Math.random() * templates.length)];
+      const mission = await this.createMissionFromTemplate(selectedTemplate, createdAdventure.id);
     }
 
     const response = new AdventureCreationResponseDto();
@@ -134,47 +133,20 @@ export class AdventureService {
       where: { step: 8, answerType: answerType },
     });
     const selectedEightTemplate = templateEightList[Math.floor(Math.random() * templateEightList.length)];
-    const missionEight = await this.prisma.mission.create({
-      data: {
-        step: selectedEightTemplate.step,
-        body: selectedEightTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * selectedEightTemplate.endNumber) + 1)),
-        quote: selectedEightTemplate.quote,
-        imagePath: selectedEightTemplate.imagePath,
-        isTransportation: selectedEightTemplate.isTransportation,
-        adventureId: adventure.id,
-      },
-    });
+    const missionEight = await this.createMissionFromTemplate(selectedEightTemplate, adventure.id);
 
     if (adventure.difficulty > 2) {
       const templateSixList = await this.prisma.missionTemplate.findMany({
         where: { step: 9 },
       });
       const selectedSixTemplate = templateSixList[Math.floor(Math.random() * templateSixList.length)];
-      const missionSix = await this.prisma.mission.create({
-        data: {
-          step: selectedSixTemplate.step,
-          body: selectedSixTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * selectedSixTemplate.endNumber) + 1)),
-          quote: selectedSixTemplate.quote,
-          imagePath: selectedSixTemplate.imagePath,
-          isTransportation: selectedSixTemplate.isTransportation,
-          adventureId: adventure.id,
-        },
-      });
+      const missionSix = await this.createMissionFromTemplate(selectedSixTemplate, adventure.id);
 
       const templateSevenList = await this.prisma.missionTemplate.findMany({
         where: { step: 10 },
       });
       const selectedSevenTemplate = templateSevenList[Math.floor(Math.random() * templateSevenList.length)];
-      const missionSeven = await this.prisma.mission.create({
-        data: {
-          step: selectedSevenTemplate.step,
-          body: selectedSevenTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * selectedSevenTemplate.endNumber) + 1)),
-          quote: selectedSevenTemplate.quote,
-          imagePath: selectedSevenTemplate.imagePath,
-          isTransportation: selectedSevenTemplate.isTransportation,
-          adventureId: adventure.id,
-        },
-      });
+      const missionSeven = await this.createMissionFromTemplate(selectedSevenTemplate, adventure.id);
     }
 
     const response = new AdventureCreationResponseDto();
@@ -198,55 +170,42 @@ export class AdventureService {
     if (length > 4) {
       throw new Error('Already exist');
     }
+
     const templateFiveList = await this.prisma.missionTemplate.findMany({
       where: { step: 5, answerType: answerType },
     });
     const selectedFiveTemplate = templateFiveList[Math.floor(Math.random() * templateFiveList.length)];
-    const missionFive = await this.prisma.mission.create({
-      data: {
-        step: selectedFiveTemplate.step,
-        body: selectedFiveTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * selectedFiveTemplate.endNumber) + 1)),
-        quote: selectedFiveTemplate.quote,
-        imagePath: selectedFiveTemplate.imagePath,
-        isTransportation: selectedFiveTemplate.isTransportation,
-        adventureId: adventure.id,
-      },
-    });
+    const missionFive = await this.createMissionFromTemplate(selectedFiveTemplate, adventure.id);
 
     if (adventure.difficulty > 1) {
       const templateSixList = await this.prisma.missionTemplate.findMany({
         where: { step: 6 },
       });
       const selectedSixTemplate = templateSixList[Math.floor(Math.random() * templateSixList.length)];
-      const missionSix = await this.prisma.mission.create({
-        data: {
-          step: selectedSixTemplate.step,
-          body: selectedSixTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * selectedSixTemplate.endNumber) + 1)),
-          quote: selectedSixTemplate.quote,
-          imagePath: selectedSixTemplate.imagePath,
-          isTransportation: selectedSixTemplate.isTransportation,
-          adventureId: adventure.id,
-        },
-      });
+      const missionSix = await this.createMissionFromTemplate(selectedSixTemplate, adventure.id);
 
       const templateSevenList = await this.prisma.missionTemplate.findMany({
         where: { step: 7 },
       });
       const selectedSevenTemplate = templateSevenList[Math.floor(Math.random() * templateSevenList.length)];
-      const missionSeven = await this.prisma.mission.create({
-        data: {
-          step: selectedSevenTemplate.step,
-          body: selectedSevenTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * selectedSevenTemplate.endNumber) + 1)),
-          quote: selectedSevenTemplate.quote,
-          imagePath: selectedSevenTemplate.imagePath,
-          isTransportation: selectedSevenTemplate.isTransportation,
-          adventureId: adventure.id,
-        },
-      });
+      const missionSeven = await this.createMissionFromTemplate(selectedSevenTemplate, adventure.id);
     }
 
     const response = new AdventureCreationResponseDto();
     response.id = adventure.id;
     return response;
+  }
+
+  private async createMissionFromTemplate(missionTemplate: MissionTemplate, adventureId: number) {
+    return await this.prisma.mission.create({
+      data: {
+        step: missionTemplate.step,
+        body: missionTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * missionTemplate.endNumber) + 1)),
+        quote: missionTemplate.quote,
+        imagePath: missionTemplate.imagePath,
+        isTransportation: missionTemplate.isTransportation,
+        adventureId: adventureId,
+      },
+    });
   }
 }
