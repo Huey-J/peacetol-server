@@ -14,12 +14,22 @@ export class MissionRepository {
     return await missions;
   }
 
+  async findLength(adventureId: number): Promise<number> {
+    const missions = prisma.mission.findMany({
+      where: {
+        adventureId: adventureId,
+      },
+    });
+
+    return (await missions).length;
+  }
+
   async findByAdventureIdAndStep(adventureId: number, step: number): Promise<Mission> {
     const mission = prisma.mission.findFirst({
       where: {
         adventureId: adventureId,
-        step: step
-      }
+        step: step,
+      },
     });
 
     return await mission;
