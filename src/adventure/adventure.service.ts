@@ -97,6 +97,69 @@ export class AdventureService {
     return response;
   }
 
+  async addFinalStep(adventureId: string, addNextStepForAdventureDto: AddNextStepForAdventureDto): Promise<AdventureCreationResponseDto> { 
+    const { userUuid, answerType } = addNextStepForAdventureDto;
+
+    const adventure: Adventure = await this.adventureRepository.getById(parseInt(adventureId));
+    const userId: number = await this.userRepository.findUser(userUuid);
+
+    if (adventure.userId !== userId) {
+      // todo exception...
+      throw new Error('Not your adventure.');
+    }
+
+    const templateEightList = await this.prisma.missionTemplate.findMany({
+      where: { step: 8, answerType: answerType },
+    });
+    const selectedEightTemplate = templateEightList[Math.floor(Math.random() * templateEightList.length)];
+    const missionEight = await this.prisma.mission.create({
+      data: {
+        step: selectedEightTemplate.step,
+        body: selectedEightTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * selectedEightTemplate.endNumber) + 1)),
+        quote: selectedEightTemplate.quote,
+        imagePath: selectedEightTemplate.imagePath,
+        isTransportation: selectedEightTemplate.isTransportation,
+        adventureId: adventure.id,
+      },
+    });
+
+    if (adventure.difficulty > 2) {
+      const templateSixList = await this.prisma.missionTemplate.findMany({
+        where: { step: 9 },
+      });
+      const selectedSixTemplate = templateSixList[Math.floor(Math.random() * templateSixList.length)];
+      const missionSix = await this.prisma.mission.create({
+        data: {
+          step: selectedSixTemplate.step,
+          body: selectedSixTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * selectedSixTemplate.endNumber) + 1)),
+          quote: selectedSixTemplate.quote,
+          imagePath: selectedSixTemplate.imagePath,
+          isTransportation: selectedSixTemplate.isTransportation,
+          adventureId: adventure.id,
+        },
+      });
+  
+      const templateSevenList = await this.prisma.missionTemplate.findMany({
+        where: { step: 10 },
+      });
+      const selectedSevenTemplate = templateSevenList[Math.floor(Math.random() * templateSevenList.length)];
+      const missionSeven = await this.prisma.mission.create({
+        data: {
+          step: selectedSevenTemplate.step,
+          body: selectedSevenTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * selectedSevenTemplate.endNumber) + 1)),
+          quote: selectedSevenTemplate.quote,
+          imagePath: selectedSevenTemplate.imagePath,
+          isTransportation: selectedSevenTemplate.isTransportation,
+          adventureId: adventure.id,
+        },
+      });
+    }
+
+    const response = new AdventureCreationResponseDto();
+    response.id = adventure.id;
+    return response;
+  }
+
   async addNextStep(adventureId: string, addNextStepForAdventureDto: AddNextStepForAdventureDto): Promise<AdventureCreationResponseDto> {
     const { userUuid, answerType } = addNextStepForAdventureDto;
 

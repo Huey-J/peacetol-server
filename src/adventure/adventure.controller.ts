@@ -44,7 +44,9 @@ export class AdventureController {
 
   @ApiOperation({ summary: '모험의 마지막 단계 생성' })
   @Put('/:id/final-step')
-  async addFinalStep(@Param('id') id: number): Promise<void> {}
+  async addFinalStep(@Param('id') id: string, @Body() addNextStepForAdventureDto: AddNextStepForAdventureDto): Promise<AdventureCreationResponseDto> {
+    return await this.adventureService.addFinalStep(id, addNextStepForAdventureDto);
+  }
 
   @ApiOperation({ summary: '모험 마무리' })
   @ApiResponse({
@@ -61,7 +63,7 @@ export class AdventureController {
     status: 200,
     type: AdventureCountCreationResponseDto,
   })
-  @Get("/count/:uuid")
+  @Get('/count/:uuid')
   async getAdventureCount(@Param('uuid') uuid: string): Promise<AdventureCountCreationResponseDto> {
     return await this.adventureService.getAdventureCount(uuid);
   }
