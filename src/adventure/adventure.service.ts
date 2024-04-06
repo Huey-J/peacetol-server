@@ -3,8 +3,8 @@ import { CreateAdventureDto } from './dto/create.adventure.request';
 import { AdventureRepository } from './adventure.repository';
 import { UserRepository } from '../user/user.repository';
 import { PrismaClient } from '@prisma/client';
-import { AdventureResponseDto, Mission } from './dto/adventure.response';
-// import { AddNextStepForAdventureDto } from './dto/add.next.step.for.adventure.request';
+import { AdventureResponseDto, MissionDto } from './dto/adventure.response';
+import { AddNextStepForAdventureDto } from './dto/add.next.step.for.adventure.request';
 import { MissionRepository } from './mission.repository';
 import { AdventureCreationResponseDto } from './dto/create.adventure.response';
 
@@ -19,15 +19,23 @@ export class AdventureService {
 
   async getById(adventureId: string): Promise<AdventureResponseDto> {
     const adventure = await this.adventureRepository.getById(parseInt(adventureId));
-
     const missions = await this.missionRepository.findAllByAdventureId(parseInt(adventureId));
+
+    const missionsDtoList: MissionDto[] = [];
+    missions.forEach((m) => {
+      const missionDto = new MissionDto();
+      missionDto.body = m.body;
+      missionDto.imagePath = m.imagePath;
+      missionDto.quote = m.quote;
+      missionsDtoList.push(missionDto);
+    });
 
     const responseDto = new AdventureResponseDto();
     responseDto.id = adventure.id;
     responseDto.createdAt = adventure.createdAt;
     responseDto.endedAt = adventure.endedAt;
     responseDto.difficulty = adventure.difficulty;
-    responseDto.missions = missions;
+    responseDto.missions = missionsDtoList;
     return responseDto;
   }
 
@@ -37,7 +45,6 @@ export class AdventureService {
 
     const createdAdventure = await this.adventureRepository.createAdventure(difficulty, userId);
 
-    const missions: Mission[] = [];
     for (let step = 1; step < 4; step++) {
       const templates = await this.prisma.missionTemplate.findMany({
         where: { step },
@@ -46,13 +53,14 @@ export class AdventureService {
 
       const mission = await this.prisma.mission.create({
         data: {
+          step: selectedTemplate.step,
           body: selectedTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * selectedTemplate.endNumber) + 1)),
           quote: selectedTemplate.quote,
           imagePath: selectedTemplate.imagePath,
+          isTransportation: selectedTemplate.isTransportation,
           adventureId: createdAdventure.id,
         },
       });
-      missions.push(mission);
     }
 
     const response = new AdventureCreationResponseDto();
@@ -60,9 +68,30 @@ export class AdventureService {
     return response;
   }
 
-  // async addNextStep(adventureId: number, addNextStepForAdventureDto: AddNextStepForAdventureDto): Promise<AdventureResponseDto> {
-  //   const adventure = this.adventureRepository.getAdventure(adventureId);
+  async addNextStep(adventureId: string, addNextStepForAdventureDto: AddNextStepForAdventureDto): Promise<AdventureCreationResponseDto> {
+    const {userUuid, answerType} = addNextStepForAdventureDto;
 
-  //   return null;
-  // }
+    const adventure = this.adventureRepository.getById(parseInt(adventureId));
+    const userId = await this.userRepository.findUser(userUuid);
+
+    // todo await 빼기...
+    if ((await adventure).userId !== userId) {
+      // todo exception
+      throw new Error('Not your adventure.');
+    }
+
+    // bus 일 경우
+
+    // 아닐 경우
+
+
+    // type으로 필터링해서 missionTemplate 조회
+
+
+    // todo
+    const response = new AdventureCreationResponseDto();
+    // response.id = createdAdventure.id;
+    // return response;
+    return response;
+  }
 }

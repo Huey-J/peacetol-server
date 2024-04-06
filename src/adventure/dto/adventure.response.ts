@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class Mission {
+export class MissionDto {
   @ApiProperty()
   body: String;
   @ApiProperty()
@@ -21,7 +21,7 @@ export class AdventureResponseDto {
 
   @ApiProperty({
     isArray: true,
-    type: Mission
+    type: MissionDto
   })
-  missions: Mission[]
+  missions: MissionDto[]
 }
