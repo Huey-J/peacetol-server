@@ -4,6 +4,9 @@ import { AdventureRepository } from './adventure.repository';
 import { UserRepository } from '../user/user.repository';
 import { PrismaClient } from '@prisma/client';
 import { AdventureResponseDto, Mission } from './dto/adventure.response';
+// import { AddNextStepForAdventureDto } from './dto/add.next.step.for.adventure.request';
+import { MissionRepository } from './mission.repository';
+import { AdventureCreationResponseDto } from './dto/create.adventure.response';
 
 @Injectable()
 export class AdventureService {
@@ -11,9 +14,24 @@ export class AdventureService {
   constructor(
     private readonly adventureRepository: AdventureRepository,
     private readonly userRepository: UserRepository,
+    private readonly missionRepository: MissionRepository,
   ) {}
 
-  async createAdventure(createAdventureDto: CreateAdventureDto): Promise<AdventureResponseDto> {
+  async getById(adventureId: string): Promise<AdventureResponseDto> {
+    const adventure = await this.adventureRepository.getById(parseInt(adventureId));
+
+    const missions = await this.missionRepository.findAllByAdventureId(parseInt(adventureId));
+
+    const responseDto = new AdventureResponseDto();
+    responseDto.id = adventure.id;
+    responseDto.createdAt = adventure.createdAt;
+    responseDto.endedAt = adventure.endedAt;
+    responseDto.difficulty = adventure.difficulty;
+    responseDto.missions = missions;
+    return responseDto;
+  }
+
+  async createAdventure(createAdventureDto: CreateAdventureDto): Promise<AdventureCreationResponseDto> {
     const { difficulty, userUuid } = createAdventureDto;
     const userId = await this.userRepository.findUser(userUuid);
 
@@ -37,13 +55,14 @@ export class AdventureService {
       missions.push(mission);
     }
 
-    const responseDto = new AdventureResponseDto();
-    responseDto.id = createdAdventure.id;
-    responseDto.createdAt = createdAdventure.createdAt;
-    responseDto.endedAt = createdAdventure.endedAt;
-    responseDto.difficulty = createdAdventure.difficulty;
-    responseDto.missions = missions;
-
-    return responseDto;
+    const response = new AdventureCreationResponseDto();
+    response.id = createdAdventure.id;
+    return response;
   }
+
+  // async addNextStep(adventureId: number, addNextStepForAdventureDto: AddNextStepForAdventureDto): Promise<AdventureResponseDto> {
+  //   const adventure = this.adventureRepository.getAdventure(adventureId);
+
+  //   return null;
+  // }
 }

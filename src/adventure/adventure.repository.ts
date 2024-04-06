@@ -14,4 +14,14 @@ export class AdventureRepository {
 
     return await adventure;
   }
+
+  async getById(adventureId: number): Promise<Adventure> {
+    const adventure = prisma.adventure.findUnique({
+      where: {
+        id: adventureId
+      }
+    })
+
+    return await adventure;
+  }
 }
