@@ -26,9 +26,11 @@ model Adventure {
 
 model Mission {
   id            Int         @id @default(autoincrement())
+  step          Int
   body          String
   quote         String
   imagePath     String?
+  isTransportation  Boolean?
   adventureId   Int
 }
 
@@ -41,6 +43,7 @@ model MissionTemplate {
   startNumber       Int?
   endNumber         Int?
   isTransportation  Boolean?
+  answerType        AnswerType?
 }
 
 // enum
