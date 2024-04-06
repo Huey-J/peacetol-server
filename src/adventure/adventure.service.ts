@@ -26,6 +26,7 @@ export class AdventureService {
   async getById(adventureId: string): Promise<AdventureResponseDto> {
     const adventure = await this.adventureRepository.getById(parseInt(adventureId));
     const missions = await this.missionRepository.findAllByAdventureId(parseInt(adventureId));
+    const user = await this.userRepository.findById(adventure.userId);
 
     const missionsDtoList: MissionDto[] = [];
     missions.forEach((m) => {
@@ -41,6 +42,7 @@ export class AdventureService {
     responseDto.createdAt = adventure.createdAt;
     responseDto.endedAt = adventure.endedAt;
     responseDto.difficulty = adventure.difficulty;
+    responseDto.createdBy = user.uuid;
     responseDto.missions = missionsDtoList;
     return responseDto;
   }

@@ -22,4 +22,13 @@ export class UserRepository {
     if (!user) throw new Error('User not found');
     return (await user).id;
   }
+
+  async findById(userId: number): Promise<User> {
+    const user = prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) throw new Error('User not found');
+    return await user;
+  }
 }
