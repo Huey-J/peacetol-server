@@ -5,7 +5,7 @@ export class CreateReviewDto {
   star: number;
 }
 
-export class ReviewCreationResponseDto {
+export class CreateReviewResponseDto {
   @ApiProperty()
   review_id: number;
   @ApiProperty()
