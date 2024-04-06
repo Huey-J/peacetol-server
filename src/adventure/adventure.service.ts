@@ -26,11 +26,9 @@ export class AdventureService {
       });
       const selectedTemplate = templates[Math.floor(Math.random() * templates.length)];
 
-      // selectedTemplate.body.replace('${number}', '' + (Math.floor(Math.random() % selectedTemplate.endNumber) + 1));
-
       const mission = await this.prisma.mission.create({
         data: {
-          body: selectedTemplate.body,
+          body: selectedTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * selectedTemplate.endNumber) + 1)),
           quote: selectedTemplate.quote,
           imagePath: selectedTemplate.imagePath,
           adventureId: createdAdventure.id,

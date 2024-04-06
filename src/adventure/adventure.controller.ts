@@ -16,7 +16,6 @@ export class AdventureController {
   })
   @Post()
   async create(@Body() createAdventureDto: CreateAdventureDto): Promise<AdventureResponseDto> {
-    console.log(createAdventureDto)
     return await this.adventureService.createAdventure(createAdventureDto);
   }
 
