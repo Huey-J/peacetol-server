@@ -10,7 +10,6 @@ datasource db {
 model User {
   id          Int       @id @default(autoincrement())
   uuid        String    @unique
-  adventure   Adventure[]
 }
 
 model Adventure {
@@ -22,9 +21,7 @@ model Adventure {
   finalSelectedAnswerType   AnswerType?
   isFirstTransportation     Boolean?
   isFinalTransportation     Boolean?
-  user                      User        @relation(fields: [userId], references: [id])
   userId                    Int
-  mission                   Mission[]
 }
 
 model Mission {
@@ -32,7 +29,6 @@ model Mission {
   body          String
   quote         String
   imagePath     String?
-  adventure     Adventure   @relation(fields: [adventureId], references: [id])
   adventureId   Int
 }
 
