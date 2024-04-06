@@ -46,6 +46,12 @@ model MissionTemplate {
   answerType        AnswerType?
 }
 
+model Review {
+  id            Int     @id @default(autoincrement())
+  star          Int?
+  adventureId   Int
+}
+
 // enum
 enum AnswerType {
 	Hungry
@@ -53,9 +59,4 @@ enum AnswerType {
   WaterSide
   Theater
   Karaoke
-}
-model Review {
-  id            Int     @id @default(autoincrement())
-  star          Int?
-  adventureId   Int
 }

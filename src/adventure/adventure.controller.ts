@@ -46,7 +46,11 @@ export class AdventureController {
   async addFinalStep(@Param('id') id: number): Promise<void> {}
 
   @ApiOperation({ summary: '모험 마무리' })
-  @Post('/:id/finish')
+  @ApiResponse({
+    status: 200,
+    type: ReviewCreationResponseDto,
+  })
+  @Put('/:id/finish')
   async finishAdventure(@Param('id') id: string, @Body() createReviewDto: CreateReviewDto): Promise<ReviewCreationResponseDto> {
     return await this.adventureService.createReview(id, createReviewDto);
   }
