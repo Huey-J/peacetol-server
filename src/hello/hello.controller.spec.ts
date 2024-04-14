@@ -16,7 +16,7 @@ describe('HelloController', () => {
 
   describe('root', () => {
     it('should return "Hello World! This is Service Class"', () => {
-      expect(helloController.findWithService()).toBe('Hello World! This is Service Class');
+      expect(helloController.returnWithService()).toBe('Hello World! This is Service Class');
     });
 
     it('ttt', () => {

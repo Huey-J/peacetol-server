@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Adventure } from '@prisma/client';
 import { AdventureRepository } from './repository/adventure.repository';
 import { ReviewRepository } from './repository/review.repository';
@@ -124,8 +124,7 @@ export class AdventureService {
     const userId: number = await this.userRepository.findUser(userUuid);
 
     if (adventure.userId !== userId) {
-      // todo exception...
-      throw new Error('Not your adventure.');
+      throw new HttpException('Not your adventure', HttpStatus.FORBIDDEN);
     }
 
     const templateEightList = await this.missionTemplateRepository.findListWithAnswer(8, answerType);
@@ -154,14 +153,13 @@ export class AdventureService {
     const userId: number = await this.userRepository.findUser(userUuid);
 
     if (adventure.userId !== userId) {
-      // todo exception...
-      throw new Error('Not your adventure.');
+      throw new HttpException('Not your adventure', HttpStatus.FORBIDDEN);
     }
 
     const length = await this.missionRepository.findLength(adventure.id);
 
     if (length > 4) {
-      throw new Error('Already exist');
+      throw new HttpException('Already exist', HttpStatus.BAD_REQUEST);
     }
     const templateFiveList = await this.missionTemplateRepository.findListWithAnswer(5, answerType);
     const selectedFiveTemplate = templateFiveList[Math.floor(Math.random() * templateFiveList.length)];

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import prisma from '../../prisma/context';
 import { User } from '@prisma/client';
 
@@ -19,7 +19,9 @@ export class UserRepository {
       where: { uuid: userUuid },
     });
 
-    if (!user) throw new Error('User not found');
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
     return (await user).id;
   }
 
@@ -28,7 +30,9 @@ export class UserRepository {
       where: { id: userId },
     });
 
-    if (!user) throw new Error('User not found');
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
     return await user;
   }
 }

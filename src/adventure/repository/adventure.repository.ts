@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import prisma from '../../../prisma/context';
 import { Adventure } from '@prisma/client';
 
@@ -26,6 +26,9 @@ export class AdventureRepository {
       },
     });
 
+    if (!adventure) {
+      throw new HttpException('Adventure not found', HttpStatus.NOT_FOUND);
+    }
     return await adventure;
   }
 
@@ -36,6 +39,9 @@ export class AdventureRepository {
       },
     });
 
+    if (!adventures) {
+      throw new HttpException('Adventure not found', HttpStatus.NOT_FOUND);
+    }
     return await adventures;
   }
 
@@ -44,8 +50,9 @@ export class AdventureRepository {
       where: { id: adventureId },
     });
     if (!existingAdventure) {
-      throw new Error(`Adventure with ID ${adventureId} not found.`);
+      throw new HttpException('Adventure not found', HttpStatus.NOT_FOUND);
     }
+    
     const updatedAdventure = await prisma.adventure.update({
       where: { id: adventureId },
       data: { endedAt: new Date() },
