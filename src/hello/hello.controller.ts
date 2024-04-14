@@ -2,7 +2,7 @@ import { Controller, Get, Param, Req } from '@nestjs/common';
 import { HelloService } from './hello.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('헬로 헬로')
+@ApiTags('HelloController')
 @Controller('hello')
 export class HelloController {
 

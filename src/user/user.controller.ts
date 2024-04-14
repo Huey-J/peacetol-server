@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Req } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param, Post, Req } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/user.response';
@@ -10,10 +10,10 @@ export class UserController {
 
   @ApiOperation({ summary: '유저 uuid 생성 및 조회' })
   @ApiResponse({
-    status: 201,
+    status: HttpStatus.CREATED,
     type: CreateUserDto,
   })
-  @Post('')
+  @Post()
   async createUserUuid(): Promise<CreateUserDto> {
     return await this.userService.createUserUuid();
   }

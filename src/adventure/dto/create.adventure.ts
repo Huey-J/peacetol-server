@@ -23,6 +23,8 @@ export class AdventureResponseDto {
   endedAt: Date;
   @ApiProperty()
   difficulty: number;
+  @ApiProperty()
+  createdBy: string;
 
   @ApiProperty({
     isArray: true,

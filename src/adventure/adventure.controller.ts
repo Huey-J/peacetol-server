@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AdventureService } from './adventure.service';
 
@@ -19,7 +19,7 @@ export class AdventureController {
 
   @Get('/:id')
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     type: AdventureResponseDto,
   })
   async getById(@Param('id') id: string): Promise<AdventureResponseDto> {
@@ -28,7 +28,7 @@ export class AdventureController {
 
   @ApiOperation({ summary: '모험 생성' })
   @ApiResponse({
-    status: 201,
+    status: HttpStatus.CREATED,
     type: CreateAdventureResponseDto,
   })
   @Post()
@@ -38,7 +38,7 @@ export class AdventureController {
 
   @ApiOperation({ summary: '모험의 다음 단계 생성' })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     type: CreateAdventureResponseDto,
   })
   @Put('/:id/next-step')
@@ -47,6 +47,10 @@ export class AdventureController {
   }
 
   @ApiOperation({ summary: '모험의 마지막 단계 생성' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: CreateAdventureResponseDto,
+  })
   @Put('/:id/final-step')
   async addFinalStep(@Param('id') id: string, @Body() addNextStepForAdventureDto: AddNestStepDto): Promise<CreateAdventureResponseDto> {
     return await this.adventureService.addFinalStep(id, addNextStepForAdventureDto);
@@ -54,7 +58,7 @@ export class AdventureController {
 
   @ApiOperation({ summary: '모험 마무리' })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     type: CreateReviewResponseDto,
   })
   @Put('/:id/finish')
@@ -64,7 +68,7 @@ export class AdventureController {
 
   @ApiOperation({ summary: 'adventure 개수 세기' })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     type: CountResponseDto,
   })
   @Get('/count/:uuid')
@@ -74,7 +78,7 @@ export class AdventureController {
 
   @ApiOperation({ summary: '최근 adventure 순서' })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     type: RecentResponseDto,
   })
   @Get('/recent/:uuid')
