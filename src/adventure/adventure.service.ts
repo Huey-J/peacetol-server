@@ -1,25 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { AdventureRepository } from './adventure.repository';
-import { ReviewRepository } from './review.repository';
+import { Adventure } from '@prisma/client';
+import { AdventureRepository } from './repository/adventure.repository';
+import { ReviewRepository } from './repository/review.repository';
 import { UserRepository } from '../user/user.repository';
-import { Adventure, MissionTemplate, PrismaClient } from '@prisma/client';
-import { MissionRepository } from './mission.repository';
+import { MissionRepository } from './repository/mission.repository';
+import { MissionTemplateRepository } from './repository/missionTemplate.repository';
 
-import { CreateAdventureDto } from './dto/create.adventure.request';
-import { AdventureResponseDto, MissionDto } from './dto/adventure.response';
-import { AddNextStepForAdventureDto } from './dto/add.next.step.for.adventure.request';
-import { AdventureCreationResponseDto, AdventureCountCreationResponseDto, RecentAdventureResponseDto } from './dto/create.adventure.response';
-import { CreateReviewDto, ReviewCreationResponseDto } from './dto/create.review';
-import { defineDmmfProperty } from '@prisma/client/runtime/library';
-import { error } from 'console';
+import {
+  AdventureResponseDto,
+  CountResponseDto,
+  CreateAdventureDto,
+  CreateAdventureResponseDto,
+  AddNestStepDto,
+  RecentResponseDto,
+} from './dto/create.adventure';
+import { CreateReviewDto, CreateReviewResponseDto } from './dto/create.review';
+import { MissionDto } from './dto/create.mission';
 
 @Injectable()
 export class AdventureService {
-  private prisma = new PrismaClient();
   constructor(
     private readonly adventureRepository: AdventureRepository,
     private readonly userRepository: UserRepository,
     private readonly missionRepository: MissionRepository,
+    private readonly missionTemplateRepository: MissionTemplateRepository,
     private readonly reviewRepository: ReviewRepository,
   ) {}
 
@@ -47,31 +51,31 @@ export class AdventureService {
     return responseDto;
   }
 
-  async createReview(id: string, createReviewDto: CreateReviewDto): Promise<ReviewCreationResponseDto> {
+  async createReview(id: string, createReviewDto: CreateReviewDto): Promise<CreateReviewResponseDto> {
     const { star } = createReviewDto;
     const adventureId = parseInt(id);
     const createdReview = await this.reviewRepository.createReview(star, adventureId);
 
     const adventure = await this.adventureRepository.updateEndedAt(adventureId);
 
-    const response = new ReviewCreationResponseDto();
+    const response = new CreateReviewResponseDto();
     response.review_id = createdReview.id;
     response.adventure_id = adventure.id;
     return response;
   }
 
-  async getAdventureCount(uuid: string): Promise<AdventureCountCreationResponseDto> {
+  async getAdventureCount(uuid: string): Promise<CountResponseDto> {
     const userId = await this.userRepository.findUser(uuid);
 
     const adventures = await this.adventureRepository.getByUserId(userId);
     const count = adventures.filter((adventure) => adventure.endedAt !== null).length;
 
-    const response = new AdventureCountCreationResponseDto();
+    const response = new CountResponseDto();
     response.count = count;
     return response;
   }
 
-  async getRecentAdventure(uuid: string): Promise<RecentAdventureResponseDto[]> {
+  async getRecentAdventure(uuid: string): Promise<RecentResponseDto[]> {
     const userId = await this.userRepository.findUser(uuid);
 
     const adventures = await this.adventureRepository.getByUserId(userId);
@@ -79,7 +83,7 @@ export class AdventureService {
 
     const response = await Promise.all(
       recentAdventures.map(async (adventure) => {
-        const dto = new RecentAdventureResponseDto();
+        const dto = new RecentResponseDto();
         dto.createdAt = adventure.createdAt;
         dto.endedAt = adventure.endedAt;
         dto.difficulty = adventure.difficulty;
@@ -91,36 +95,29 @@ export class AdventureService {
     return response;
   }
 
-  async createAdventure(createAdventureDto: CreateAdventureDto): Promise<AdventureCreationResponseDto> {
+  async createAdventure(createAdventureDto: CreateAdventureDto): Promise<CreateAdventureResponseDto> {
     const { difficulty, userUuid } = createAdventureDto;
     const userId = await this.userRepository.findUser(userUuid);
 
     const createdAdventure = await this.adventureRepository.createAdventure(difficulty, userId);
 
-    const templateFirstList = await this.prisma.missionTemplate.findMany({
-      where: { step: 1 },
-    });
+    const templateFirstList = await this.missionTemplateRepository.findList(1);
     const selectedFirstTemplate = templateFirstList[Math.floor(Math.random() * templateFirstList.length)];
-    const missionOne = await this.createMissionFromTemplate(selectedFirstTemplate, createdAdventure.id);
-    
+    const missionOne = await this.missionRepository.createMissionFromTemplate(selectedFirstTemplate, createdAdventure.id);
+
     const isTransportation = missionOne.isTransportation;
     for (let step = 2; step < 5; step++) {
-      const templates = await this.prisma.missionTemplate.findMany({
-        where: {
-          step: step,
-          OR: [{ isTransportation: isTransportation }, { isTransportation: null }],
-        },
-      });
+      const templates = await this.missionTemplateRepository.findListWithOR(step, isTransportation);
       const selectedTemplate = templates[Math.floor(Math.random() * templates.length)];
-      const mission = await this.createMissionFromTemplate(selectedTemplate, createdAdventure.id);
+      const mission = await this.missionRepository.createMissionFromTemplate(selectedTemplate, createdAdventure.id);
     }
 
-    const response = new AdventureCreationResponseDto();
+    const response = new CreateAdventureResponseDto();
     response.id = createdAdventure.id;
     return response;
   }
 
-  async addFinalStep(adventureId: string, addNextStepForAdventureDto: AddNextStepForAdventureDto): Promise<AdventureCreationResponseDto> { 
+  async addFinalStep(adventureId: string, addNextStepForAdventureDto: AddNestStepDto): Promise<CreateAdventureResponseDto> {
     const { userUuid, answerType } = addNextStepForAdventureDto;
 
     const adventure: Adventure = await this.adventureRepository.getById(parseInt(adventureId));
@@ -131,32 +128,26 @@ export class AdventureService {
       throw new Error('Not your adventure.');
     }
 
-    const templateEightList = await this.prisma.missionTemplate.findMany({
-      where: { step: 8, answerType: answerType },
-    });
+    const templateEightList = await this.missionTemplateRepository.findListWithAnswer(8, answerType);
     const selectedEightTemplate = templateEightList[Math.floor(Math.random() * templateEightList.length)];
-    const missionEight = await this.createMissionFromTemplate(selectedEightTemplate, adventure.id);
+    const missionEight = await this.missionRepository.createMissionFromTemplate(selectedEightTemplate, adventure.id);
 
     if (adventure.difficulty > 2) {
-      const templateSixList = await this.prisma.missionTemplate.findMany({
-        where: { step: 9 },
-      });
+      const templateSixList = await this.missionTemplateRepository.findList(9);
       const selectedSixTemplate = templateSixList[Math.floor(Math.random() * templateSixList.length)];
-      const missionSix = await this.createMissionFromTemplate(selectedSixTemplate, adventure.id);
+      const missionSix = await this.missionRepository.createMissionFromTemplate(selectedSixTemplate, adventure.id);
 
-      const templateSevenList = await this.prisma.missionTemplate.findMany({
-        where: { step: 10 },
-      });
+      const templateSevenList = await this.missionTemplateRepository.findList(10);
       const selectedSevenTemplate = templateSevenList[Math.floor(Math.random() * templateSevenList.length)];
-      const missionSeven = await this.createMissionFromTemplate(selectedSevenTemplate, adventure.id);
+      const missionSeven = await this.missionRepository.createMissionFromTemplate(selectedSevenTemplate, adventure.id);
     }
 
-    const response = new AdventureCreationResponseDto();
+    const response = new CreateAdventureResponseDto();
     response.id = adventure.id;
     return response;
   }
 
-  async addNextStep(adventureId: string, addNextStepForAdventureDto: AddNextStepForAdventureDto): Promise<AdventureCreationResponseDto> {
+  async addNextStep(adventureId: string, addNextStepForAdventureDto: AddNestStepDto): Promise<CreateAdventureResponseDto> {
     const { userUuid, answerType } = addNextStepForAdventureDto;
 
     const adventure: Adventure = await this.adventureRepository.getById(parseInt(adventureId));
@@ -172,42 +163,22 @@ export class AdventureService {
     if (length > 4) {
       throw new Error('Already exist');
     }
-
-    const templateFiveList = await this.prisma.missionTemplate.findMany({
-      where: { step: 5, answerType: answerType },
-    });
+    const templateFiveList = await this.missionTemplateRepository.findListWithAnswer(5, answerType);
     const selectedFiveTemplate = templateFiveList[Math.floor(Math.random() * templateFiveList.length)];
-    const missionFive = await this.createMissionFromTemplate(selectedFiveTemplate, adventure.id);
+    const missionFive = await this.missionRepository.createMissionFromTemplate(selectedFiveTemplate, adventure.id);
 
     if (adventure.difficulty > 1) {
-      const templateSixList = await this.prisma.missionTemplate.findMany({
-        where: { step: 6 },
-      });
+      const templateSixList = await this.missionTemplateRepository.findList(6);
       const selectedSixTemplate = templateSixList[Math.floor(Math.random() * templateSixList.length)];
-      const missionSix = await this.createMissionFromTemplate(selectedSixTemplate, adventure.id);
+      const missionSix = await this.missionRepository.createMissionFromTemplate(selectedSixTemplate, adventure.id);
 
-      const templateSevenList = await this.prisma.missionTemplate.findMany({
-        where: { step: 7 },
-      });
+      const templateSevenList = await this.missionTemplateRepository.findList(7);
       const selectedSevenTemplate = templateSevenList[Math.floor(Math.random() * templateSevenList.length)];
-      const missionSeven = await this.createMissionFromTemplate(selectedSevenTemplate, adventure.id);
+      const missionSeven = await this.missionRepository.createMissionFromTemplate(selectedSevenTemplate, adventure.id);
     }
 
-    const response = new AdventureCreationResponseDto();
+    const response = new CreateAdventureResponseDto();
     response.id = adventure.id;
     return response;
-  }
-
-  private async createMissionFromTemplate(missionTemplate: MissionTemplate, adventureId: number) {
-    return await this.prisma.mission.create({
-      data: {
-        step: missionTemplate.step,
-        body: missionTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * missionTemplate.endNumber) + 1)),
-        quote: missionTemplate.quote,
-        imagePath: missionTemplate.imagePath,
-        isTransportation: missionTemplate.isTransportation,
-        adventureId: adventureId,
-      },
-    });
   }
 }

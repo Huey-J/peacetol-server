@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import prisma from '../../prisma/context';
 import { Review } from '@prisma/client';
+import prisma from '../../../prisma/context';
 
 @Injectable()
 export class ReviewRepository {

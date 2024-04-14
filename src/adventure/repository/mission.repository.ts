@@ -1,9 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import prisma from '../../prisma/context';
-import { Mission } from '@prisma/client';
+import { Mission, MissionTemplate } from '@prisma/client';
+import prisma from '../../../prisma/context';
 
 @Injectable()
 export class MissionRepository {
+  async createMissionFromTemplate(missionTemplate: MissionTemplate, adventureId: number): Promise<Mission> {
+    const mission = prisma.mission.create({
+      data: {
+        step: missionTemplate.step,
+        body: missionTemplate.body.replace('${number}', '' + (Math.floor(Math.random() * missionTemplate.endNumber) + 1)),
+        quote: missionTemplate.quote,
+        imagePath: missionTemplate.imagePath,
+        isTransportation: missionTemplate.isTransportation,
+        adventureId: adventureId,
+      },
+    });
+
+    return await mission;
+  }
+
   async findAllByAdventureId(adventureId: number): Promise<Mission[]> {
     const missions = prisma.mission.findMany({
       where: {
